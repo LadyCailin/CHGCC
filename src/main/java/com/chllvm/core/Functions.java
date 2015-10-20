@@ -2,6 +2,7 @@ package com.chllvm.core;
 
 import com.laytonsmith.PureUtilities.CommandExecutor;
 import com.laytonsmith.PureUtilities.Common.FileUtil;
+import com.laytonsmith.PureUtilities.Common.OSUtils;
 import com.laytonsmith.PureUtilities.SimpleVersion;
 import com.laytonsmith.PureUtilities.Version;
 import com.laytonsmith.annotations.api;
@@ -52,7 +53,11 @@ public class Functions {
 				String script = args[0].val();
 				tempDir.mkdirs();
 				File scriptLocation = new File(tempDir, "temp.cpp");
-				File execLocation = new File(tempDir, "temp");
+				String ext = "";
+				if(OSUtils.GetOS() == OSUtils.OS.WINDOWS){
+					ext = ".exe";
+				}
+				File execLocation = new File(tempDir, "temp" + ext);
 				FileUtil.write(script, scriptLocation);
 				CommandExecutor ce = new CommandExecutor(
 					new String[]{"g++", scriptLocation.getCanonicalPath(), "-o", execLocation.getCanonicalPath()});
@@ -66,7 +71,7 @@ public class Functions {
 				}));
 				int status = ce.start().waitFor();
 				if(status == 0){
-					CommandExecutor exec = new CommandExecutor(execLocation.getCanonicalPath());
+					CommandExecutor exec = new CommandExecutor(new String[]{execLocation.getCanonicalPath()});
 					exec.setSystemInputsAndOutputs();
 					exec.start().waitFor();
 				} else {

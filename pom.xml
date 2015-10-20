@@ -1,0 +1,257 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>com.chgcc</groupId>
+	<artifactId>chgcc</artifactId>
+	<version>1.0.1-SNAPSHOT</version>
+	<name>CHGCC</name>
+	<description>Run C/C++ code directly from MethodScript!</description>
+	<inceptionYear>2015</inceptionYear>
+	<organization>
+		<name>LadyCailin</name>
+	</organization>
+	<licenses>
+		<license>
+			<name>The MIT License</name>
+			<url>LICENSE.txt</url>
+			<distribution>repo</distribution>
+		</license>
+	</licenses>
+	<scm>
+		<connection>scm:git:git://github.com/LadyCailin/chjavascript.git</connection>
+		<url>https://github.com/LadyCailin/chjavascript</url>
+		<developerConnection>scm:git:git@github.com:LadyCailin/chjavascript.git</developerConnection>
+	</scm>
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+	</properties>
+	<repositories>
+		<!-- Repository for other dependencies of SK's -->
+		<repository>
+			<id>sk89q-mvn2</id>
+			<url>http://mvn2.sk89q.com/repo</url>
+		</repository>
+
+		<!-- Other repositories -->
+		<repository>
+			<id>maven-central</id>
+			<url>http://repo1.maven.org/maven2/</url>
+		</repository>
+	</repositories>
+	<dependencies>
+		<!-- Required component -->
+		<dependency>
+			<groupId>com.sk89q</groupId>
+			<artifactId>commandhelper</artifactId>
+			<version>3.3.1-SNAPSHOT</version>
+		</dependency>
+	</dependencies>
+	<build>
+		<sourceDirectory>${basedir}/src/main/java</sourceDirectory>
+
+		<!-- Resources -->
+		<resources>
+			<resource>
+				<targetPath>.</targetPath>
+				<filtering>true</filtering>
+				<directory>${basedir}/src/main/resources/</directory>
+				<includes>
+					<include>**</include>
+				</includes>
+			</resource>
+		</resources>
+		<testResources>
+			<testResource>
+				<targetPath>.</targetPath>
+				<directory>${basedir}/src/test/resources</directory>
+			</testResource>
+		</testResources>
+
+		<!-- Plugins -->
+		<plugins>
+			<!-- Leave this alone! Compile-time checks so that your extension works. -->
+			<plugin>
+				<groupId>org.bsc.maven</groupId>
+				<artifactId>maven-processor-plugin</artifactId>
+				<version>2.2.4</version>
+
+				<executions>
+					<execution>
+						<id>process</id>
+						<phase>process-classes</phase>
+
+						<goals>
+							<goal>process</goal>
+						</goals>
+					</execution>
+				</executions>
+
+				<configuration>
+					<outputDirectory>src/main/generated</outputDirectory>
+
+					<processors>
+						<processor>com.laytonsmith.core.extensions.ExtensionAnnotationProcessor</processor>
+					</processors>
+				</configuration>
+			</plugin>
+
+			<!-- Leave this alone! Run-time extension loading speedup. -->
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>exec-maven-plugin</artifactId>
+				<version>1.2.1</version>
+
+				<executions>
+					<execution>
+						<id>cache-annotations</id>
+						<phase>process-classes</phase>
+						<goals>
+							<goal>java</goal>
+						</goals>
+					</execution>
+				</executions>
+
+				<configuration>
+					<mainClass>com.laytonsmith.PureUtilities.ClassLoading.Annotations.CacheAnnotations</mainClass>
+
+					<arguments>
+						<argument>${basedir}/target/classes</argument>
+						<argument>${basedir}/target/classes</argument>
+					</arguments>
+				</configuration>
+			</plugin>
+			<!-- Compile plugin -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>2.3.2</version>
+			</plugin>
+
+			<!-- JAR creation plugin -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-jar-plugin</artifactId>
+				<version>2.3.1</version>
+				<configuration>
+					<archive>
+						<addMavenDescriptor>true</addMavenDescriptor>
+						<pomPropertiesFile>true</pomPropertiesFile>
+						<manifest>
+							<addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
+							<addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+						</manifest>
+						<manifestEntries>
+							<Class-Path></Class-Path>
+						</manifestEntries>
+					</archive>
+				</configuration>
+			</plugin>
+
+			<!-- Assembly -->
+			<plugin>
+				<artifactId>maven-assembly-plugin</artifactId>
+				<version>2.2-beta-2</version>
+				<configuration>
+					<descriptor>${basedir}/src/main/assembly/default.xml</descriptor>
+				</configuration>
+			</plugin>
+
+			<!-- Release -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-release-plugin</artifactId>
+				<version>2.2.2</version>
+				<configuration>
+					<preparationGoals>assembly:assembly</preparationGoals>
+					<goals>assembly:assembly</goals>
+				</configuration>
+			</plugin>
+
+			<!-- Getting rid of maven warnings by providing versions for the following plugins -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-javadoc-plugin</artifactId>
+				<version>2.4</version>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-deploy-plugin</artifactId>
+				<version>2.6</version>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-source-plugin</artifactId>
+				<version>2.1.2</version>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<version>2.9</version>
+				<configuration>
+					<includes>
+						<!-- Include the default test cases, since we're overwriting them -->
+						<include>**/*Test.java</include>
+						<include>**/Test*.java</include>
+						<include>**/*TestCase.java</include>
+					</includes>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>cobertura-maven-plugin</artifactId>
+				<version>2.4</version>
+			</plugin>
+
+			<!-- Site / report generation -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-site-plugin</artifactId>
+				<version>3.1</version>
+				<configuration>
+					<reportPlugins>
+						<plugin>
+							<groupId>org.apache.maven.plugins</groupId>
+							<artifactId>maven-project-info-reports-plugin</artifactId>
+							<version>2.5</version>
+							<reportSets>
+								<reportSet>
+									<reports>
+										<report>license</report>
+										<report>index</report>
+									</reports>
+								</reportSet>
+							</reportSets>
+						</plugin>
+						<plugin>
+							<groupId>org.apache.maven.plugins</groupId>
+							<artifactId>maven-javadoc-plugin</artifactId>
+							<version>2.8.1</version>
+						</plugin>
+						<plugin>
+							<groupId>org.codehaus.mojo</groupId>
+							<artifactId>cobertura-maven-plugin</artifactId>
+							<version>2.4</version>
+						</plugin>
+					</reportPlugins>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+	<profiles>
+		<profile>
+			<id>provisional-build</id>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-surefire-plugin</artifactId>
+						<version>2.9</version>
+						<configuration>
+							<skipTests>true</skipTests>
+						</configuration>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
+</project>

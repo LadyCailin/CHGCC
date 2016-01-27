@@ -10,6 +10,8 @@ import com.laytonsmith.core.constructs.CVoid;
 import com.laytonsmith.core.constructs.Construct;
 import com.laytonsmith.core.constructs.Target;
 import com.laytonsmith.core.environments.Environment;
+import com.laytonsmith.core.exceptions.CRE.CREIOException;
+import com.laytonsmith.core.exceptions.CRE.CREPluginInternalException;
 import com.laytonsmith.core.exceptions.ConfigRuntimeException;
 import com.laytonsmith.core.functions.AbstractFunction;
 import com.laytonsmith.core.functions.Exceptions;
@@ -27,8 +29,8 @@ public class Functions {
 	@api
 	public static class cpp_eval extends AbstractFunction {
 
-		public Exceptions.ExceptionType[] thrown() {
-			return new Exceptions.ExceptionType[]{};
+		public Class[] thrown() {
+			return new Class[]{CREIOException.class, CREPluginInternalException.class};
 		}
 
 		public boolean isRestricted() {
@@ -47,7 +49,7 @@ public class Functions {
 			} catch (InterruptedException ex) {
 				Logger.getLogger(Functions.class.getName()).log(Level.SEVERE, null, ex);
 			} catch (IOException ex) {
-				throw new ConfigRuntimeException("g++ must first be installed on your system", Exceptions.ExceptionType.IOException, t, ex);
+				throw new CREIOException("g++ must first be installed on your system", t, ex);
 			}
 			try {
 				String script = args[0].val();
@@ -75,12 +77,12 @@ public class Functions {
 					exec.setSystemInputsAndOutputs();
 					exec.start().waitFor();
 				} else {
-					throw new ConfigRuntimeException(error.toString(), Exceptions.ExceptionType.PluginInternalException, t);
+					throw new CREPluginInternalException(error.toString(), t);
 				}
 			} catch (InterruptedException ex) {
 				Logger.getLogger(Functions.class.getName()).log(Level.SEVERE, null, ex);
 			} catch (IOException ex) {
-				throw new ConfigRuntimeException(ex.getMessage(), Exceptions.ExceptionType.IOException, t, ex);
+				throw new CREIOException(ex.getMessage(), t, ex);
 			} finally {
 				FileUtil.recursiveDelete(tempDir);
 			}

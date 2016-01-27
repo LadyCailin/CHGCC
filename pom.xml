@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.chgcc</groupId>
 	<artifactId>chgcc</artifactId>
-	<version>1.0.1-SNAPSHOT</version>
+	<version>1.0.2-SNAPSHOT</version>
 	<name>CHGCC</name>
 	<description>Run C/C++ code directly from MethodScript!</description>
 	<inceptionYear>2015</inceptionYear>
@@ -43,7 +43,7 @@
 		<dependency>
 			<groupId>com.sk89q</groupId>
 			<artifactId>commandhelper</artifactId>
-			<version>3.3.1-SNAPSHOT</version>
+			<version>3.3.2-SNAPSHOT</version>
 		</dependency>
 	</dependencies>
 	<build>
